@@ -66,14 +66,30 @@
                                 <p class="text-sky-600/80 font-medium text-sm md:text-base">Please let us know if you'll be joining us.</p>
                             </div>
                             
+                            <!-- Batch Selection Filter -->
+                            <div class="mb-4 md:mb-6">
+                                <label class="block text-sm font-bold text-sky-900 mb-2 md:mb-3">Filter by Batch (Optional)</label>
+                                <div class="relative">
+                                    <select v-model="selectedBatchForSubmit" @change="onBatchChange" class="w-full p-3 md:p-4 bg-sky-50/50 border-2 border-sky-100 rounded-2xl focus:ring-4 focus:ring-sky-100 focus:border-sky-400 transition-all outline-none font-medium text-slate-700 appearance-none cursor-pointer text-sm md:text-base">
+                                        <option value="">-- All Batches --</option>
+                                        <option v-for="batch in submitFilteredBatches" :key="batch" :value="batch">
+                                            {{ batch }}
+                                        </option>
+                                    </select>
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <i class="fas fa-chevron-down text-sky-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Name Selection -->
                             <div class="mb-6 md:mb-8">
                                 <label class="block text-sm font-bold text-sky-900 mb-2 md:mb-3">Select Your Name</label>
                                 <div class="relative">
                                     <select v-model="selectedName" @change="submitError = ''" class="w-full p-3 md:p-4 bg-sky-50/50 border-2 border-sky-100 rounded-2xl focus:ring-4 focus:ring-sky-100 focus:border-sky-400 transition-all outline-none font-medium text-slate-700 appearance-none cursor-pointer text-sm md:text-base">
                                         <option value="">-- Choose your name from the list --</option>
-                                        <option v-for="user in users" :key="user.Name" :value="user.Name">
-                                            {{ user.Name }} (Batch {{ user.Batch }}) {{ user.status !== 'pending' ? ' - Submitted' : '' }}
+                                        <option v-for="user in submitFilteredUsers" :key="user.Name" :value="user.Name">
+                                            {{ user.Name }} {{ !selectedBatchForSubmit ? `(Batch ${user.Batch})` : '' }} {{ user.status !== 'pending' ? ' - Submitted' : '' }}
                                         </option>
                                     </select>
                                     <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -135,6 +151,7 @@
                                         <p class="text-xs md:text-sm text-sky-600/80 mb-4 font-medium">Create a 4-digit PIN to digitally sign and lock your response.</p>
                                         <input 
                                             type="text" 
+                                            inputmode="numeric"
                                             maxlength="4"
                                             placeholder="e.g. 1234"
                                             v-model="pin"
@@ -314,6 +331,7 @@
                 const isLoading = ref(true);
                 
                 // Submit State
+                const selectedBatchForSubmit = ref('');
                 const selectedName = ref('');
                 const selectedStatus = ref('');
                 const pin = ref('');
@@ -344,6 +362,22 @@
                     if (activeBatchFilter.value === 'All') return users.value;
                     return users.value.filter(u => u.Batch === activeBatchFilter.value);
                 });
+
+                // Submit Form Computeds
+                const submitFilteredBatches = computed(() => {
+                    const batches = new Set(users.value.map(u => u.Batch));
+                    return Array.from(batches).sort();
+                });
+
+                const submitFilteredUsers = computed(() => {
+                    if (!selectedBatchForSubmit.value) return users.value;
+                    return users.value.filter(u => u.Batch === selectedBatchForSubmit.value);
+                });
+
+                const onBatchChange = () => {
+                    selectedName.value = '';
+                    submitError.value = '';
+                };
 
                 // Methods
                 const fetchData = async () => {
@@ -396,7 +430,12 @@
                 };
 
                 const loginAdmin = () => {
-                    if (adminPassword.value === 'spidey@hha') {
+                    // Password obfuscated as char codes to hide it from GitHub source code
+                    const secret = [115, 112, 105, 100, 101, 121, 64, 104, 104, 97]; 
+                    const isMatch = adminPassword.value.length === secret.length && 
+                                    adminPassword.value.split('').every((char, i) => char.charCodeAt(0) === secret[i]);
+                    
+                    if (isMatch) {
                         isAdmin.value = true;
                         adminError.value = '';
                     } else {
@@ -438,6 +477,7 @@
 
                 return {
                     activeTab, users, isLoading, GOOGLE_SCRIPT_URL,
+                    selectedBatchForSubmit, submitFilteredBatches, submitFilteredUsers, onBatchChange,
                     selectedName, selectedStatus, pin, isSubmitting, submitError, currentUserData, submitForm,
                     isAdmin, adminPassword, adminError, jsonInput, jsonMessage, isUpdatingJson, activeBatchFilter, loginAdmin, updateJson,
                     totalGoing, totalNotGoing, totalPending, uniqueBatches, filteredUsers, fetchData
