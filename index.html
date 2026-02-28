@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECA Quizverse Retreat Confirmation</title>
+    <title>ECA Quizverse Retreat - See You Soon!</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Vue 3 -->
@@ -25,17 +25,17 @@
                 <div class="flex flex-col md:flex-row justify-between items-center py-5 md:py-6 gap-4">
                     <div class="flex items-center gap-4">
                         <div class="bg-white/50 p-2.5 rounded-xl shadow-sm backdrop-blur-sm border border-white/60">
-                            <i class="fas fa-users text-2xl text-sky-700"></i>
+                            <i class="fas fa-moon text-2xl text-sky-700"></i>
                         </div>
                         <div>
                             <h1 class="text-xl md:text-2xl font-black tracking-tight text-sky-900">ECA Quizverse Retreat</h1>
-                            <p class="text-sky-700/80 text-xs md:text-sm font-bold tracking-wide uppercase mt-0.5">Official Confirmation</p>
+                            <p class="text-sky-700/80 text-xs md:text-sm font-bold tracking-wide uppercase mt-0.5">Iftaar Gathering</p>
                         </div>
                     </div>
                     
                     <nav class="flex flex-wrap justify-center gap-2 bg-sky-300/30 p-1.5 rounded-2xl border border-sky-300/50 w-full md:w-auto">
-                        <button @click="activeTab = 'submit'" :class="['px-3 md:px-5 py-2 rounded-xl text-sm font-bold transition-all flex-1 md:flex-none', activeTab === 'submit' ? 'bg-white text-sky-600 shadow-sm' : 'text-sky-800 hover:text-sky-950 hover:bg-white/40']">
-                            Submit Form
+                        <button @click="activeTab = 'info'" :class="['px-3 md:px-5 py-2 rounded-xl text-sm font-bold transition-all flex-1 md:flex-none', activeTab === 'info' ? 'bg-white text-sky-600 shadow-sm' : 'text-sky-800 hover:text-sky-950 hover:bg-white/40']">
+                            <i class="fas fa-info-circle"></i> Event Info
                         </button>
                         <button @click="activeTab = 'admin'" :class="['px-3 md:px-5 py-2 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1.5 flex-1 md:flex-none', activeTab === 'admin' ? 'bg-white text-sky-600 shadow-sm' : 'text-sky-800 hover:text-sky-950 hover:bg-white/40']">
                             <i class="fas fa-lock text-sm"></i> Admin
@@ -50,130 +50,152 @@
             <!-- Loading Spinner -->
             <div v-if="isLoading" class="flex flex-col justify-center items-center py-24">
                 <i class="fas fa-circle-notch fa-spin text-4xl text-sky-400 mb-4"></i>
-                <p class="text-sky-800 font-bold">Connecting to Database...</p>
+                <p class="text-sky-800 font-bold">Loading Event Details...</p>
                 <p v-if="GOOGLE_SCRIPT_URL === 'PASTE_YOUR_WEB_APP_URL_HERE'" class="text-rose-500 font-bold mt-4 text-center max-w-md">
                     Error: You forgot to paste your Google Apps Script Web App URL in the HTML code!
                 </p>
             </div>
 
             <div v-else class="transition-opacity duration-500">
-                <!-- ================= SUBMIT VIEW ================= -->
-                <div v-if="activeTab === 'submit'" class="max-w-2xl mx-auto">
+                <!-- ================= EVENT INFO VIEW ================= -->
+                <div v-if="activeTab === 'info'" class="max-w-4xl mx-auto space-y-8">
+                    
+                    <!-- Thank You & Details Card -->
                     <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-sky-100 overflow-hidden">
-                        <div class="p-5 sm:p-8 md:p-10">
-                            <div class="text-center mb-6 md:mb-8">
-                                <h2 class="text-2xl md:text-3xl font-black text-sky-950 mb-2">Confirm Attendance</h2>
-                                <p class="text-sky-600/80 font-medium text-sm md:text-base">Please let us know if you'll be joining us.</p>
+                        <div class="p-8 md:p-10 text-center bg-gradient-to-b from-white to-sky-50/30">
+                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-6 shadow-sm border border-emerald-200">
+                                <i class="fas fa-check text-4xl text-emerald-500"></i>
                             </div>
-                            
-                            <!-- Batch Selection Filter -->
-                            <div class="mb-4 md:mb-6">
-                                <label class="block text-sm font-bold text-sky-900 mb-2 md:mb-3">Filter by Batch (Optional)</label>
-                                <div class="relative">
-                                    <select v-model="selectedBatchForSubmit" @change="onBatchChange" class="w-full p-3 md:p-4 bg-sky-50/50 border-2 border-sky-100 rounded-2xl focus:ring-4 focus:ring-sky-100 focus:border-sky-400 transition-all outline-none font-medium text-slate-700 appearance-none cursor-pointer text-sm md:text-base">
-                                        <option value="">-- All Batches --</option>
-                                        <option v-for="batch in submitFilteredBatches" :key="batch" :value="batch">
-                                            {{ batch }}
-                                        </option>
-                                    </select>
-                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                        <i class="fas fa-chevron-down text-sky-400"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Name Selection -->
-                            <div class="mb-6 md:mb-8">
-                                <label class="block text-sm font-bold text-sky-900 mb-2 md:mb-3">Select Your Name</label>
-                                <div class="relative">
-                                    <select v-model="selectedName" @change="submitError = ''" class="w-full p-3 md:p-4 bg-sky-50/50 border-2 border-sky-100 rounded-2xl focus:ring-4 focus:ring-sky-100 focus:border-sky-400 transition-all outline-none font-medium text-slate-700 appearance-none cursor-pointer text-sm md:text-base">
-                                        <option value="">-- Choose your name from the list --</option>
-                                        <option v-for="user in submitFilteredUsers" :key="user.Name" :value="user.Name">
-                                            {{ user.Name }} {{ !selectedBatchForSubmit ? `(Batch ${user.Batch})` : '' }} {{ user.status !== 'pending' ? ' - Submitted' : '' }}
-                                        </option>
-                                    </select>
-                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                        <i class="fas fa-chevron-down text-sky-400"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Dynamic Form Area -->
-                            <div v-if="currentUserData" class="transition-all duration-300">
-                                <!-- Locked State -->
-                                <div v-if="currentUserData.status !== 'pending'" class="bg-sky-50 rounded-3xl p-6 md:p-8 border-2 border-sky-100 text-center">
-                                    <div class="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-sm mb-4 md:mb-5">
-                                        <i class="fas fa-shield-check text-3xl md:text-4xl text-sky-400"></i>
-                                    </div>
-                                    <h3 class="text-xl md:text-2xl font-black text-sky-950 mb-2 md:mb-3">Response Locked</h3>
-                                    <p class="text-sky-700/80 font-medium text-sm md:text-base mb-6 md:mb-8 max-w-sm mx-auto">
-                                        This response has already been submitted and is permanently secured.
-                                    </p>
-                                    <div class="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 rounded-2xl bg-white border border-sky-100 shadow-sm font-bold text-base md:text-lg">
-                                        Status: 
-                                        <span v-if="currentUserData.status === 'going'" class="text-emerald-500 flex items-center gap-1.5"><i class="fas fa-check-circle"></i> Going</span>
-                                        <span v-else class="text-rose-400 flex items-center gap-1.5"><i class="fas fa-times-circle"></i> Not Going</span>
-                                    </div>
-                                </div>
-
-                                <!-- Submission Form -->
-                                <form v-else @submit.prevent="submitForm" class="space-y-6">
-                                    <div class="bg-rose-50 border-2 border-rose-100 rounded-2xl p-5 md:p-6">
-                                        <div class="flex gap-3 md:gap-4">
-                                            <i class="fas fa-exclamation-triangle text-2xl text-rose-400 flex-shrink-0 mt-1"></i>
-                                            <div>
-                                                <h4 class="font-bold text-rose-900 text-base md:text-lg">Strict Disclaimer</h4>
-                                                <p class="text-xs md:text-sm text-rose-700/80 mt-1 font-medium leading-relaxed">
-                                                    Confirm <strong>ONLY</strong> if you are absolutely able to come. Once you click submit, your decision is final, uneditable, and locked to your name.
-                                                </p>
-                                            </div>
+                            <h2 class="text-3xl md:text-4xl font-black text-sky-950 mb-4">Registration Closed</h2>
+                            <p class="text-lg text-sky-700/90 font-medium max-w-2xl mx-auto leading-relaxed">
+                                Thank you to everyone for responding! For those who have confirmed, <strong class="text-sky-900">see you at the Iftaar tomorrow!</strong>
+                            </p>
+                        </div>
+                        
+                        <!-- Event Details Split -->
+                        <div class="bg-sky-50/50 border-t border-sky-100 p-8 md:p-10 grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-black text-sky-900 mb-6">Gathering Details</h3>
+                                <div class="space-y-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center flex-shrink-0 text-amber-500 text-2xl border border-sky-100">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-sky-900/60 uppercase tracking-wider mb-1">Timing</p>
+                                            <p class="text-xl font-black text-sky-950">5:00 PM Onwards</p>
                                         </div>
                                     </div>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <label :class="['relative flex flex-col items-center justify-center p-5 md:p-8 rounded-3xl border-2 cursor-pointer transition-all', selectedStatus === 'going' ? 'border-emerald-300 bg-emerald-50 shadow-[0_0_20px_rgba(52,211,153,0.15)]' : 'border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30 bg-white']">
-                                            <input type="radio" v-model="selectedStatus" value="going" class="sr-only" />
-                                            <i :class="['fas fa-check-circle text-3xl md:text-4xl mb-2 md:mb-3 transition-colors', selectedStatus === 'going' ? 'text-emerald-500' : 'text-slate-300']"></i>
-                                            <span :class="['font-black text-base md:text-lg', selectedStatus === 'going' ? 'text-emerald-700' : 'text-slate-400']">I AM GOING</span>
-                                        </label>
-
-                                        <label :class="['relative flex flex-col items-center justify-center p-5 md:p-8 rounded-3xl border-2 cursor-pointer transition-all', selectedStatus === 'not_going' ? 'border-rose-300 bg-rose-50 shadow-[0_0_20px_rgba(251,113,133,0.15)]' : 'border-slate-100 hover:border-rose-200 hover:bg-rose-50/30 bg-white']">
-                                            <input type="radio" v-model="selectedStatus" value="not_going" class="sr-only" />
-                                            <i :class="['fas fa-times-circle text-3xl md:text-4xl mb-2 md:mb-3 transition-colors', selectedStatus === 'not_going' ? 'text-rose-400' : 'text-slate-300']"></i>
-                                            <span :class="['font-black text-base md:text-lg', selectedStatus === 'not_going' ? 'text-rose-700' : 'text-slate-400']">I AM NOT GOING</span>
-                                        </label>
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center flex-shrink-0 text-rose-500 text-2xl border border-sky-100">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-sky-900/60 uppercase tracking-wider mb-1">Location</p>
+                                            <p class="text-lg font-black text-sky-950 mb-1">Star Kabab, Elephant Road</p>
+                                            <p class="text-sm font-medium text-sky-800 mb-3 leading-snug max-w-xs md:max-w-sm">
+                                                66, 67 S J Jahanara Imam Sharani, Dhaka 1205<br>
+                                                <span class="text-xs text-sky-600/90">(In front of BRAC Bank on Northwestern Road from Bata Signal, Katabon)</span>
+                                            </p>
+                                            <a href="https://maps.app.goo.gl/Bbxn8grZBqXE4UZZ9" target="_blank" class="inline-flex items-center gap-2 bg-sky-400 hover:bg-sky-500 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md hover:shadow-lg">
+                                                <i class="fas fa-location-arrow"></i> Open in Maps
+                                            </a>
+                                        </div>
                                     </div>
-
-                                    <div class="bg-sky-50/50 p-5 md:p-6 rounded-3xl border-2 border-sky-100">
-                                        <label class="block text-sm font-bold text-sky-900 mb-2">
-                                            Set a Security PIN <span class="text-rose-400">*</span>
-                                        </label>
-                                        <p class="text-xs md:text-sm text-sky-600/80 mb-4 font-medium">Create a 4-digit PIN to digitally sign and lock your response.</p>
-                                        <input 
-                                            type="text" 
-                                            inputmode="numeric"
-                                            maxlength="4"
-                                            placeholder="e.g. 1234"
-                                            v-model="pin"
-                                            @input="pin = pin.replace(/\D/g, '')"
-                                            class="w-full p-3 md:p-4 bg-white border-2 border-sky-100 rounded-2xl focus:ring-4 focus:ring-sky-100 focus:border-sky-400 transition-all outline-none text-center text-xl md:text-2xl tracking-[1em] font-black text-sky-950 placeholder:text-slate-300 placeholder:tracking-normal placeholder:font-medium placeholder:text-base"
-                                        />
-                                    </div>
-
-                                    <p v-if="submitError" class="text-rose-500 text-sm font-bold text-center bg-rose-50 p-3 rounded-xl">{{ submitError }}</p>
-
-                                    <button 
-                                        type="submit" 
-                                        :disabled="isSubmitting"
-                                        class="w-full bg-sky-400 hover:bg-sky-500 text-white font-black text-base md:text-lg py-4 md:py-5 rounded-3xl shadow-[0_8px_20px_rgba(56,189,248,0.25)] hover:shadow-[0_12px_25px_rgba(56,189,248,0.35)] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 transform active:scale-[0.98]"
-                                    >
-                                        <span v-if="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Locking Response...</span>
-                                        <span v-else>Lock My Response <i class="fas fa-lock"></i></span>
-                                    </button>
-                                </form>
+                                </div>
+                            </div>
+                            
+                            <!-- Embedded Map -->
+                            <div class="h-64 md:h-72 bg-slate-200 rounded-3xl overflow-hidden shadow-inner border-4 border-white relative">
+                                <!-- Using a generic location view for the embed; the exact location is handled by the direct link button -->
+                                <iframe 
+                                    src="https://maps.google.com/maps?q=Dhaka&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+                                    width="100%" 
+                                    height="100%" 
+                                    style="border:0;" 
+                                    allowfullscreen="" 
+                                    loading="lazy">
+                                </iframe>
+                                <div class="absolute inset-0 pointer-events-none border border-black/5 rounded-[1.25rem]"></div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Confirmed Attendees List Grouped by Batch -->
+                    <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-sky-100 overflow-hidden">
+                        <div class="p-8 md:p-10">
+                            <div class="flex items-center gap-4 mb-8">
+                                <div class="w-12 h-12 bg-sky-100 text-sky-500 rounded-2xl flex items-center justify-center text-xl">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-black text-sky-950">Confirmed Attendees</h3>
+                                    <p class="text-sky-600/80 font-medium text-sm">Organized by batches</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div v-for="group in confirmedByBatch" :key="group.batch" class="bg-sky-50/50 rounded-3xl p-6 border-2 border-sky-100">
+                                    <div class="inline-block bg-sky-200/60 text-sky-900 px-4 py-1.5 rounded-xl text-sm font-black mb-5 border border-sky-200">
+                                        Batch {{ group.batch }}
+                                    </div>
+                                    <ul class="space-y-3">
+                                        <li v-for="user in group.users" :key="user.Name" class="flex items-start gap-3">
+                                            <i class="fas fa-check-circle text-emerald-400 text-sm mt-1 flex-shrink-0"></i> 
+                                            <span class="font-bold text-slate-700 leading-tight">{{ user.Name }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div v-if="confirmedByBatch.length === 0" class="text-center py-10">
+                                <p class="text-sky-600/60 font-bold">No confirmed attendees found yet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Form Confirmations Section -->
+                    <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-violet-100 overflow-hidden mt-8">
+                        <div class="p-8 md:p-10">
+                            <div class="flex items-center gap-4 mb-8">
+                                <div class="w-12 h-12 bg-violet-100 text-violet-500 rounded-2xl flex items-center justify-center text-xl">
+                                    <i class="fab fa-wpforms"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-black text-violet-950">Google Form Confirmations</h3>
+                                    <p class="text-violet-600/80 font-medium text-sm">Registrations collected via external form</p>
+                                </div>
+                            </div>
+                            
+                            <div v-if="formUsers && formUsers.length > 0" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div v-for="group in formConfirmedByBatch" :key="group.batch" class="bg-violet-50/50 rounded-3xl p-6 border-2 border-violet-100">
+                                    <div class="inline-block bg-violet-200/60 text-violet-900 px-4 py-1.5 rounded-xl text-sm font-black mb-5 border border-violet-200">
+                                        Batch {{ group.batch }}
+                                    </div>
+                                    <ul class="space-y-3">
+                                        <li v-for="user in group.users" :key="user.Name" class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-violet-100/50">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fas fa-user-circle text-violet-300 text-lg flex-shrink-0"></i> 
+                                                <span class="font-bold text-slate-700 leading-tight">{{ user.Name }}</span>
+                                            </div>
+                                            <span v-if="user.status === 'not_going'" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-500 text-[10px] uppercase tracking-wider font-black border border-rose-100">
+                                                <i class="fas fa-times"></i> Not Going
+                                            </span>
+                                            <span v-else class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] uppercase tracking-wider font-black border border-emerald-100">
+                                                <i class="fas fa-check"></i> Going
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div v-else class="text-center py-10 bg-violet-50/50 rounded-3xl border border-violet-100 border-dashed">
+                                <p class="text-violet-600/60 font-bold mb-2">No Google Form responses found.</p>
+                                <p class="text-violet-500/60 text-sm max-w-sm mx-auto">If you know people have submitted, ensure your Google Apps Script was deployed as a <strong>New version</strong> and the sheet tab is named exactly <em>Google Form Confirmations</em>.</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- ================= ADMIN VIEW ================= -->
@@ -237,42 +259,10 @@
                             </div>
                         </div>
 
-                        <!-- JSON Updater -->
-                        <div class="bg-white rounded-[2rem] shadow-sm border border-sky-100 overflow-hidden">
-                            <div class="p-6 md:p-8">
-                                <div class="flex items-center gap-3 mb-6">
-                                    <div class="bg-sky-50 p-2.5 rounded-xl border border-sky-100">
-                                        <i class="fas fa-file-code text-sky-600 text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg md:text-xl font-black text-sky-950">Manage Participants (JSON)</h3>
-                                        <p class="text-sky-600/80 text-xs md:text-sm font-medium">This replaces the current participant list in the Google Sheet.</p>
-                                    </div>
-                                </div>
-                                <div class="space-y-4">
-                                    <textarea
-                                        v-model="jsonInput"
-                                        class="w-full h-40 p-4 bg-slate-900 text-sky-300 font-mono text-xs md:text-sm rounded-2xl border-2 border-sky-100 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 outline-none resize-y"
-                                        placeholder='[\n  {\n    "Name": "New Person",\n    "Batch": 105\n  }\n]'
-                                    ></textarea>
-                                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                                        <span v-if="jsonMessage" :class="['px-4 py-2 rounded-xl text-sm font-bold w-full sm:w-auto text-center', jsonMessage.includes('Success') ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-500 border border-rose-100']">
-                                            {{ jsonMessage }}
-                                        </span>
-                                        <div v-else class="hidden sm:block"></div>
-                                        <button @click="updateJson" :disabled="isUpdatingJson" class="w-full sm:w-auto bg-sky-100 hover:bg-sky-200 text-sky-800 font-black px-6 py-3 rounded-xl transition-colors flex items-center justify-center gap-2 border border-sky-200 disabled:opacity-50">
-                                            <span v-if="isUpdatingJson"><i class="fas fa-spinner fa-spin"></i> Updating...</span>
-                                            <span v-else><i class="fas fa-plus"></i> Update via JSON</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Embedded Batch Status Board -->
                         <div class="pt-8 border-t-2 border-sky-100/50">
                             <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-                                <h2 class="text-2xl md:text-3xl font-black text-sky-950">Batch Status Board</h2>
+                                <h2 class="text-2xl md:text-3xl font-black text-sky-950">Detailed Status Board</h2>
                                 <div class="flex flex-wrap justify-center gap-2 bg-white/60 p-1.5 rounded-2xl border border-sky-100 shadow-sm backdrop-blur-sm">
                                     <button v-for="batch in uniqueBatches" :key="batch" @click="activeBatchFilter = batch" :class="['px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all', activeBatchFilter === batch ? 'bg-sky-400 text-white shadow-md' : 'text-sky-800 hover:bg-sky-100/50']">
                                         {{ batch === 'All' ? 'All Batches' : `Batch ${batch}` }}
@@ -313,7 +303,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -326,33 +315,56 @@
 
         createApp({
             setup() {
-                const activeTab = ref('submit');
+                const activeTab = ref('info');
                 const users = ref([]);
+                const formUsers = ref([]);
                 const isLoading = ref(true);
-                
-                // Submit State
-                const selectedBatchForSubmit = ref('');
-                const selectedName = ref('');
-                const selectedStatus = ref('');
-                const pin = ref('');
-                const isSubmitting = ref(false);
-                const submitError = ref('');
 
                 // Admin State
                 const isAdmin = ref(false);
                 const adminPassword = ref('');
                 const adminError = ref('');
-                const jsonInput = ref('');
-                const jsonMessage = ref('');
-                const isUpdatingJson = ref(false);
                 const activeBatchFilter = ref('All');
 
-                // Computeds
-                const currentUserData = computed(() => users.value.find(u => u.Name === selectedName.value));
+                // Computeds for Stats
                 const totalGoing = computed(() => users.value.filter(u => u.status === 'going').length);
                 const totalNotGoing = computed(() => users.value.filter(u => u.status === 'not_going').length);
                 const totalPending = computed(() => users.value.filter(u => u.status === 'pending').length);
                 
+                // Grouping Confirmed Attendees by Batch
+                const confirmedByBatch = computed(() => {
+                    const goingUsers = users.value.filter(u => u.status === 'going');
+                    const grouped = {};
+                    
+                    goingUsers.forEach(user => {
+                        if (!grouped[user.Batch]) {
+                            grouped[user.Batch] = [];
+                        }
+                        grouped[user.Batch].push(user);
+                    });
+                    
+                    // Convert to array and sort batches
+                    return Object.keys(grouped).sort().map(batch => ({
+                        batch: batch,
+                        users: grouped[batch].sort((a, b) => a.Name.localeCompare(b.Name))
+                    }));
+                });
+
+                // Grouping Form Attendees by Batch
+                const formConfirmedByBatch = computed(() => {
+                    const grouped = {};
+                    formUsers.value.forEach(user => {
+                        const batch = user.Batch || 'Unknown';
+                        if (!grouped[batch]) grouped[batch] = [];
+                        grouped[batch].push(user);
+                    });
+                    
+                    return Object.keys(grouped).sort().map(batch => ({
+                        batch: batch,
+                        users: grouped[batch].sort((a, b) => a.Name.localeCompare(b.Name))
+                    }));
+                });
+
                 const uniqueBatches = computed(() => {
                     const batches = new Set(users.value.map(u => u.Batch));
                     return ['All', ...Array.from(batches).sort()];
@@ -363,29 +375,20 @@
                     return users.value.filter(u => u.Batch === activeBatchFilter.value);
                 });
 
-                // Submit Form Computeds
-                const submitFilteredBatches = computed(() => {
-                    const batches = new Set(users.value.map(u => u.Batch));
-                    return Array.from(batches).sort();
-                });
-
-                const submitFilteredUsers = computed(() => {
-                    if (!selectedBatchForSubmit.value) return users.value;
-                    return users.value.filter(u => u.Batch === selectedBatchForSubmit.value);
-                });
-
-                const onBatchChange = () => {
-                    selectedName.value = '';
-                    submitError.value = '';
-                };
-
                 // Methods
                 const fetchData = async () => {
                     isLoading.value = true;
                     try {
                         const response = await fetch(GOOGLE_SCRIPT_URL);
                         const data = await response.json();
-                        users.value = data.sort((a, b) => a.Batch - b.Batch || a.Name.localeCompare(b.Name));
+                        
+                        // Handle both old array format and new object format (with form users)
+                        if (Array.isArray(data)) {
+                            users.value = data.sort((a, b) => a.Batch - b.Batch || a.Name.localeCompare(b.Name));
+                        } else {
+                            users.value = (data.websiteUsers || []).sort((a, b) => a.Batch - b.Batch || a.Name.localeCompare(b.Name));
+                            formUsers.value = data.formUsers || [];
+                        }
                     } catch (err) {
                         console.error("Failed to fetch data:", err);
                     } finally {
@@ -393,44 +396,8 @@
                     }
                 };
 
-                const submitForm = async () => {
-                    submitError.value = '';
-                    if (!selectedName.value) return submitError.value = 'Please select your name first.';
-                    if (!selectedStatus.value) return submitError.value = 'Please select whether you are going or not.';
-                    if (pin.value.length < 4) return submitError.value = 'Please enter a 4-digit PIN.';
-
-                    isSubmitting.value = true;
-                    try {
-                        const payload = {
-                            action: 'submit',
-                            name: selectedName.value,
-                            batch: currentUserData.value.Batch,
-                            status: selectedStatus.value,
-                            pin: pin.value
-                        };
-
-                        await fetch(GOOGLE_SCRIPT_URL, {
-                            method: 'POST',
-                            body: JSON.stringify(payload)
-                        });
-
-                        // Refresh local state without full reload
-                        const userIndex = users.value.findIndex(u => u.Name === selectedName.value);
-                        if(userIndex !== -1) {
-                            users.value[userIndex].status = selectedStatus.value;
-                        }
-                        
-                        selectedStatus.value = '';
-                        pin.value = '';
-                    } catch (err) {
-                        submitError.value = 'Network error. Please try again.';
-                    } finally {
-                        isSubmitting.value = false;
-                    }
-                };
-
                 const loginAdmin = () => {
-                    // Password obfuscated as char codes to hide it from GitHub source code
+                    // Password obfuscated as char codes to hide it from GitHub source code ("spidey@hha")
                     const secret = [115, 112, 105, 100, 101, 121, 64, 104, 104, 97]; 
                     const isMatch = adminPassword.value.length === secret.length && 
                                     adminPassword.value.split('').every((char, i) => char.charCodeAt(0) === secret[i]);
@@ -443,31 +410,6 @@
                     }
                 };
 
-                const updateJson = async () => {
-                    jsonMessage.value = '';
-                    try {
-                        if (!jsonInput.value.trim()) throw new Error("JSON input cannot be empty.");
-                        const parsedData = JSON.parse(jsonInput.value);
-                        if (!Array.isArray(parsedData)) throw new Error("JSON must be an array.");
-                        
-                        isUpdatingJson.value = true;
-                        
-                        await fetch(GOOGLE_SCRIPT_URL, {
-                            method: 'POST',
-                            body: JSON.stringify({ action: 'updateJSON', users: parsedData })
-                        });
-                        
-                        jsonMessage.value = "Success! Data updated in Google Sheet.";
-                        jsonInput.value = '';
-                        await fetchData(); // Refresh table
-                    } catch (err) {
-                        jsonMessage.value = err.message || "Invalid JSON format.";
-                    } finally {
-                        isUpdatingJson.value = false;
-                        setTimeout(() => jsonMessage.value = '', 4000);
-                    }
-                };
-
                 // Init
                 onMounted(() => {
                     if (GOOGLE_SCRIPT_URL !== 'PASTE_YOUR_WEB_APP_URL_HERE') {
@@ -477,10 +419,9 @@
 
                 return {
                     activeTab, users, isLoading, GOOGLE_SCRIPT_URL,
-                    selectedBatchForSubmit, submitFilteredBatches, submitFilteredUsers, onBatchChange,
-                    selectedName, selectedStatus, pin, isSubmitting, submitError, currentUserData, submitForm,
-                    isAdmin, adminPassword, adminError, jsonInput, jsonMessage, isUpdatingJson, activeBatchFilter, loginAdmin, updateJson,
-                    totalGoing, totalNotGoing, totalPending, uniqueBatches, filteredUsers, fetchData
+                    isAdmin, adminPassword, adminError, activeBatchFilter, loginAdmin,
+                    totalGoing, totalNotGoing, totalPending, uniqueBatches, filteredUsers, confirmedByBatch, 
+                    formUsers, formConfirmedByBatch, fetchData
                 };
             }
         }).mount('#app');
