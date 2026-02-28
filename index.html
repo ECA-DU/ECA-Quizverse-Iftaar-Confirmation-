@@ -389,6 +389,20 @@
                             users.value = (data.websiteUsers || []).sort((a, b) => a.Batch - b.Batch || a.Name.localeCompare(b.Name));
                             formUsers.value = data.formUsers || [];
                         }
+
+                        // --- MANUAL OVERRIDE ---
+                        // Forces Meshkatum into Batch 103 and confirms her attendance, ignoring the sheet
+                        let meshkatum = users.value.find(u => u.Name.includes("Meshkatum"));
+                        if (meshkatum) {
+                            meshkatum.Batch = 103;
+                            meshkatum.status = 'going';
+                        } else {
+                            users.value.push({ Name: "Meshkatum Munira Rafia", Batch: 103, status: 'going' });
+                        }
+                        // Re-sort the list to put her in alphabetical order within the batch
+                        users.value.sort((a, b) => a.Batch - b.Batch || a.Name.localeCompare(b.Name));
+                        // -----------------------
+
                     } catch (err) {
                         console.error("Failed to fetch data:", err);
                     } finally {
